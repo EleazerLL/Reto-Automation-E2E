@@ -34,12 +34,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<dependency>
-		    <groupId>com.intuit.karate</groupId>
-		    <artifactId>karate-gatling</artifactId>
-		    <version>1.4.1</version>
-		    <scope>test</scope>
-		</dependency>
+
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -109,14 +104,6 @@
 					<artifactId>maven-clean-plugin</artifactId>
 					<version>3.1.0</version>
 				</plugin>
-				<plugin>
-		            <groupId>io.gatling</groupId>
-		            <artifactId>gatling-maven-plugin</artifactId>
-		            <version>4.3.0</version>
-		            <configuration>
-		            <simulationsFolder>src/test/java/performance</simulationsFolder>
-		            </configuration>
-        		</plugin>
 				<!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
 				<plugin>
 					<artifactId>maven-resources-plugin</artifactId>

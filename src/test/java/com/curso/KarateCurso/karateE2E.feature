@@ -1,28 +1,43 @@
-Feature: Pruebas de web E2E flujo de venta completo
+@e2e
+Feature: Flujo de compra completo en SauceDemo
 
-Background:
-    * configure driver = { type: 'chrome', addOptions: ["--start-maximized"] }
+  Background:
+    * configure driver = { type: 'chrome', showDriverLog: false }
+    * def loginData = read('datos_login.json')
+
+  Scenario Outline: Comprar un <producto> exitosamente
+    # 1. Login
     Given driver 'https://www.saucedemo.com/'
-    And input('#user-name', 'standard_user')
-    And input('#password', 'secret_sauce')
-    When click('#login-button')
-    And waitFor('.title')
-
-Scenario: Comprar el producto más caro y validar el flujo del carrito
-    Then match driver.url contains 'inventory.html'
-    * def priceElements = locateAll('.inventory_item_price')
-    * def prices = karate.map(priceElements, function(x){ return x.text.replace('$', '') * 1 })
-    * def expensiveItems = prices.filter(x => x >= 49)
-    And assert expensiveItems.length > 0
-    * def precioAComprar = expensiveItems[0]
-    * def btnComprar = "//div[text()='" + precioAComprar + "']/ancestor::div[@class='inventory_item_description']//button"
-    And scroll(btnComprar)
-    When click(btnComprar)
-    * screenshot()
+    And input('#user-name', loginData.user)
+    And input('#password', loginData.password)
+    And click('#login-button')
+    
+    # 2. Selección de Producto y Carrito
+    # Buscamos el producto por texto y hacemos clic en su botón de "Add to cart"
+    * def xpathBtn = "//div[text()='<producto>']/ancestor::div[@class='inventory_item']//button"
+    And waitFor(xpathBtn)
+    And click(xpathBtn)
+    
+    # 3. Ir al Carrito y Checkout
     And click('.shopping_cart_link')
-    Then match text('.title') == 'Your Cart'
-    And match driver.url contains 'cart.html'
-    And click("//button[contains(text(),'Remove')]")
-    And click('#continue-shopping')
-    Then match text('.title') == 'Products'
-    * screenshot()
+    *  screenshot()
+    And click('#checkout')
+    
+    # 4. Información de Envío (Checkout Step One)
+    And input('#first-name', 'Job')
+    And input('#last-name', 'Tester')
+    And input('#postal-code', '4820000')
+    And click('#continue')
+    
+    # 5. Finalizar (Checkout Step Two)
+    And click('#finish')
+    
+    # 6. Validación de éxito
+    Then waitFor('.complete-header')
+    And match text('.complete-header') == 'Thank you for your order!'
+
+    Examples:
+      | producto                         |
+      | Sauce Labs Backpack              |
+      | Sauce Labs Bolt T-Shirt          |
+      | Sauce Labs Onesie                |
